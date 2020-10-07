@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>三字棋</title>
+</head>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+
+    #board {
+        width: 300px;
+        height: 300px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    #board .item {
+        width: 100px;
+        height: 100px;
+        box-sizing: border-box;
+        border: 1px solid #fff;
+        background: greenyellow;
+        font-size: 50px;
+        line-height: 100px;
+        text-align: center;
+    }
+</style>
+<body>
+<div id="board"></div>
+</body>
+<script>
+	const arr = [
+		[0, 0, 0],
+		[0, 0, 0],
+		[0, 0, 0]
+	]
+	let color = 1;
+	const board = document.getElementById('board');
+
+	function show() {
+		board.innerHTML = '';
+		for (let i = 0; i < arr.length; i++) {
+			for (let j = 0; j < arr.length; j++) {
+				const item = document.createElement('div');
+				item.className = 'item';
+				const boardi = arr[i][j];
+				item.innerText = boardi === 0 ? '' : boardi === 1 ? '⭕️' : '❌';
+				item.addEventListener('click', () => userMove(i, j));
+				board.appendChild(item);
+			}
+		}
+	}
+
+	function clone(arg) {
+		return JSON.parse(JSON.stringify(arg));
+	}
+
+	function userMove(i, j) {
+		if (arr[i][j] !== 0) return;
+		arr[i][j] = color = 3 - color;
+		show();
+		if (check(arr, i, j)) {
+			alert(color === 2 ? '❌ win' : '⭕️ win');
+			return;
+		}
+		if (willWin(arr, color)) {
+			console.log(willWin(arr, color))
+		}
+		computeMove();
+	}
+
+	function computeMove() {
+		const bestPoint = bestChose(arr, 3 - color).point;
+		console.log(bestPoint)
+		if (bestPoint) {
+			const [i, j] = bestPoint || [];
+			arr[i][j] = color = 3 - color;
+			show()
+			if (check(arr, i, j)) {
+				alert(color === 2 ? '❌ win' : '⭕️ win');
+				return;
+			}
+		}
+	}
+
+	function mutipNum(...args) {
+		// [1, 0, 1] result 0
+		// [1, 1, 1] reuslt 1
+		// [2, 2, 2] result 8
+		if (args.length === 0) {
+			return 0;
+		}
+		return args.reduce((prev, cur) => prev * cur, 1);
+	}
+
+	function bestChose(arr, color) {
+		// 判断该颜色是不是要赢了
+		const p = willWin(arr, color);
+		if (p) {
+			return {
+				point: p,
+				result: 1
+			}
+		}
+		let result = -2;
+		let point = null;
+		outer:for (let i = 0; i < arr.length; i++) {
+			for (let j = 0; j < arr.length; j++) {
+				if (arr[i][j]) {
+					continue;
+				}
+				let newArr = clone(arr);
+				newArr[i][j] = color;
+				// 得到对方最好的选择
+				const r = bestChose(newArr, 3 - color).result;
+				if (-r > result) {
+					result = -r;
+					point = [i, j];
+				}
+				if (result === 1) {
+					result = 1;
+					point = [i, j];
+					break outer;
+                }
+			}
+		}
+		return {
+			result: point ? result : 0,
+			point,
+		}
+	}
+
+	function check(arr, i, j) {
+		const len = arr.length;
+		// 找到i,j坐标 垂直水平方向和对角方向坐标
+		let row = arr[i];
+		let col = [];
+		let duijiao1 = [];
+		let duijiao2 = [];
+		for (let x = 0; x < len; x++) {
+			col.push(arr[x][j])
+			for (let y = 0; y < len; y++) {
+				if (i === j && x === y) {
+					duijiao1.push(arr[x][y])
+				}
+				if (2 - i === j && 2 - x === y) {
+					duijiao2.push(arr[x][y])
+				}
+			}
+		}
+		const rowTotal = mutipNum(...row);
+		const colTotal = mutipNum(...col);
+		const duijiao1Total = mutipNum(...duijiao1);
+		const duijiao2Total = mutipNum(...duijiao2);
+		if (rowTotal === 1 || rowTotal === 8) {
+			return true
+		}
+		if (colTotal === 1 || colTotal === 8) {
+			return true
+		}
+		if (duijiao1Total === 1 || duijiao1Total === 8) {
+			return true
+		}
+		if (duijiao2Total === 1 || duijiao2Total === 8) {
+			return true
+		}
+		return false;
+	}
+
+	function willWin(arr, color) {
+		for (let i = 0; i < arr.length; i++) {
+			for (let j = 0; j < arr.length; j++) {
+				if (arr[i][j]) {
+					continue;
+				}
+				let newArr = clone(arr);
+				newArr[i][j] = color;
+				if (check(newArr, i, j)) {
+					return [i, j];
+				}
+			}
+		}
+		return null;
+	}
+
+	show();
+</script>
+</html>
