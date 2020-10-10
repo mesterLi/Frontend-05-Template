@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>异步方案</title>
+</head>
+<style>
+    body > div {
+        width: 100px;
+        height: 100px;
+        display: inline-block;
+        background: grey;
+        border-radius: 50px;
+    }
+
+    #green.light {
+        background: green;
+    }
+
+    #yellow.light {
+        background: yellow;
+    }
+
+    #red.light {
+        background: red;
+    }
+</style>
+<body>
+<div id="green"></div>
+<div id="red"></div>
+<div id="yellow"></div>
+<button id="next">next</button>
+</body>
+<script>
+	const red = document.getElementById('red');
+	const green = document.getElementById('green');
+	const yellow = document.getElementById('yellow');
+
+	function addLight(id) {
+		[...document.getElementsByTagName('div')].forEach(dom => {
+			dom.classList.remove('light');
+		});
+		id.classList.add('light');
+	}
+
+	// 1、
+	// window.go = function () {
+	//     setTimeout(() => {
+	// 	    addLight(green);
+	// 	    setTimeout(() => {
+	// 		    addLight(yellow);
+	// 		    setTimeout(() => {
+	// 			    addLight(red);
+	// 			    go()
+	// 		    }, 200)
+	// 	    }, 300)
+	//     }, 1000)
+	// }
+	// 2、
+	function sleep(delay) {
+		return new Promise((resolve) => {
+			setTimeout(resolve, delay);
+		})
+	}
+    function handControl() {
+		const next = document.getElementById('next');
+		return new Promise((resolve) => {
+			next.addEventListener('click', resolve, { once: true });
+        })
+    }
+	// window.go = function () {
+	// 	sleep(2000)
+	// 		.then(() => {
+	// 			addLight(green);
+	// 		})
+	// 		.then(() => sleep(1000))
+	// 		.then(() => addLight(yellow))
+	// 		.then(() => sleep(1000))
+	// 		.then(() => {
+	// 			addLight(red)
+	// 			go()
+	// 		})
+	// }
+    //3、
+    // window.go = async function () {
+    //     while (true) {
+	//         addLight(green);
+	//         await sleep(1000);
+	//         addLight(yellow);
+	//         await sleep(500);
+	//         addLight(red)
+	//         await sleep(300);
+    //     }
+    // }
+    // 4手动控制
+    // window.go = async function () {
+    //     while (true) {
+    //         addLight(green);
+    //         await handControl();
+    //         addLight(yellow);
+    //         await handControl();
+    //         addLight(red)
+    //         await handControl();
+    //     }
+    // }
+    // 5 generator
+    // function* gen() {
+    //     addLight(green);
+    //     yield sleep(1000);
+    //     addLight(yellow);
+    //     yield sleep(500);
+    //     addLight(red);
+    //     yield sleep(300);
+    // }
+    // let g = gen();
+    // function go() {
+    //     const { value, done } = g.next();
+    //     if (!done) {
+    //     	value.then(() => go())
+    //     } else {
+    //     	g = gen();
+    //     	go();
+    //     }
+    // }
+    // 6 async generator
+    async function* counter() {
+      let i = 0;
+      while (true) {
+      	await sleep(1000);
+        yield i++;
+      }
+    }
+    window.go = async function () {
+        for await (let i of counter()) {
+        	console.log(i)
+        }
+    }
+</script>
+</html>
