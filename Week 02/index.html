@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    #map {
+        width: 600px;
+        height: 600px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    #map .item {
+        width: 6px;
+        height: 6px;
+        border: 1px solid grey;
+        box-sizing: border-box;
+        font-size: 10px;
+    }
+    .actived {
+        background: #000;
+        color: #fff;
+    }
+    .green {
+        background: greenyellow;
+    }
+    .blue {
+        background: orangered;
+    }
+    .red {
+        background: blue;
+    }
+</style>
+<body>
+    <div id="map"></div>
+    <button id="save">保存</button>
+</body>
+<script src="./Sorted.js"></script>
+<script src="./BinaryHeap.js"></script>
+<script>
+    let arr = new Array(10000).fill(0);
+    const map = document.getElementById('map');
+    const getXY = (x, y) => x * 100 + y;
+    document.getElementById('save').onclick = function() {
+	    localStorage.setItem('arr', JSON.stringify(arr));
+    }
+    const tempArr = localStorage.getItem('arr')
+    if (!!tempArr) {
+    	arr = JSON.parse(tempArr);
+    }
+    const draw = function() {
+    	map.innerHTML = '';
+	    for (let i = 0; i < 100; i ++) {
+		    for (let j = 0; j < 100; j++) {
+			    const node = document.createElement('div')
+			    const xy = i * 100 + j;
+			    if(arr[xy] === 1) {
+				    node.classList.add('actived')
+			    }
+                if(arr[xy] === 2) {
+                    node.classList.add('green')
+                }
+			    node.classList.add('item');
+			    map.appendChild(node);
+			    node.addEventListener('mousemove', () => {
+			    	if (down) {
+			    		if (clear) {
+			    			node.className = '';
+			    			node.classList.add('item')
+			    			arr[xy] = 0;
+                        } else {
+                            node.classList.add('actived');
+                            arr[xy] = 1;
+                        }
+                    }
+                })
+		    }
+	    }
+    }
+    draw();
+    let down = false;
+    let clear = false;
+    document.addEventListener('mousedown', e => {
+	    down = true;
+	    console.log(e);
+	    clear = (e.which === 3);
+    });
+    document.addEventListener('mouseup', () => down = false);
+    map.addEventListener('contextmenu', e => e.preventDefault());
+
+    const sleep = function() {
+    	return new Promise((resolve) => {
+          setTimeout(resolve)
+        })
+    }
+
+    const path = async function(arr, start, end) {
+    	const cloneArr = Object.create(arr);
+    	const childs = map.children;
+    	// 算出当前点距离终点xy轴差值，差值越小距离终点越近
+	    const distance = coss => {
+		    return (coss[0] - end[0]) ** 2 + (coss[1] - end[1]) ** 2
+	    }
+	    // const queue = new Sorted([start], (a, b) => distance(a) - distance(b));
+	    const queue = new BinaryHeap([start], (a, b) => distance(a) - distance(b));
+
+	    const insert = async function (x, y, pre) {
+	    	// 最大坐标为 [99, 99]所以 x,y大于能等于100，直接return
+            if (x >= 100 || x < 0 || y >= 100 || y < 0) {
+            	return;
+            }
+            const coss = getXY(x, y);
+            if (cloneArr[coss]) {
+            	return;
+            }
+            // cloneArr[coss] = 2; 用当前节点的父节点代替2，保存路径
+			//     console.log(pre, [x, y])
+            cloneArr[coss] = pre;
+            await sleep();
+            childs[coss].classList.add('green');
+            queue.insert([x, y]);
+        }
+	    while (queue.length > 0) {
+		    const [x, y] = queue.take();
+            if (x === end[0] && y === end[1]) {
+            	console.log('找到了');
+            	let [i, j] = [x, y];
+                let path = [];
+                while (i !== start[0] || j !== start[1]) {
+                	path.push([i, j]);
+                	[i, j] = cloneArr[getXY(i, j)];
+                	await sleep();
+                	childs[i * 100 + j].classList.add('blue');
+                }
+                return path;
+            }
+            await insert(x-1, y, [x, y]);
+            await insert(x, y+1, [x, y]);
+            await insert(x+1, y, [x, y]);
+            await insert(x, y-1, [x, y]);
+            // 斜角
+            await insert(x+1, y+1, [x, y]);
+            await insert(x-1, y-1, [x, y]);
+            await insert(x-1, y+1, [x, y]);
+            await insert(x+1, y-1, [x, y]);
+	    }
+    }
+    path(arr, [0, 0], [40, 40])
+</script>
+</html>
