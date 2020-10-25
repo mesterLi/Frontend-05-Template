@@ -7,6 +7,9 @@ function* tokenrize(str) {
 	while (true) {
 		i++;
 		const result = reg.exec(str);
+		// exec 返回一个结果数组，下标0是匹配到结果
+		// 剩下的索引对应括号位置，可以通过这个与关键词对应
+		// console.log(result)
 		if (!result) {
 			break;
 		}
@@ -28,7 +31,7 @@ function* tokenrize(str) {
 	}
 }
 
-for (let i of tokenrize('1 + (2 - 3)')) {
+for (let i of tokenrize('1 + 2 - 3')) {
 	if (i.type !== 'WhiteSpace' && i.type !== 'UnToken') {
 		source.push(i);
 	}
@@ -104,5 +107,5 @@ function MultiplicationExpression(source) {
 			}
 	}
 }
-// Expression(source);
+Expression(source);
 // console.log(source)
