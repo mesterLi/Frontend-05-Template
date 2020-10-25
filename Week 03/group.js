@@ -28,7 +28,7 @@ function* tokenrize(str) {
 	}
 }
 
-for (let i of tokenrize('1 + (2 - 3)')) {
+for (let i of tokenrize('(1 + 2) * 3')) {
 	if (i.type !== 'WhiteSpace' && i.type !== 'UnToken') {
 		source.push(i);
 	}
@@ -44,7 +44,7 @@ function Expression(source) {
 		return source;
 	}
 	AdditiveExpression(source);
-	return Expression(source);
+	// return Expression(source);
 }
 
 function AdditiveExpression(source) {
@@ -71,12 +71,37 @@ function AdditiveExpression(source) {
 				}
 				node.children.push(source.shift());
 				node.children.push(source.shift());
-				// 如果当前是加减表达式，也就意味着 下标1为 +-，下标2为Number需要调用MultiplicationExpression处理成乘法表达式
-				MultiplicationExpression(source);
+				// 如果当前是加减表达式，也就意味着 下标1为 +-或者括号（）符号，下标2为Number需要调用MultiplicationExpression处理成乘法表达式
+				// if (source[0].type === '(') {
+				// 	Group(source)
+				// }
+				// if (source[0].type === ')') {
+				// 	// console.log(')', source);
+				// 	Group(source);
+				// }
+				if (source[0].type === 'Number') {
+					MultiplicationExpression(source);
+				}
 				node.children.push(source.shift());
 				source.unshift(node);
 				return AdditiveExpression(source);
 			}
+		case '(':
+			let group = {
+				type: 'GroupExpression',
+				children: []
+			}
+			source[0] = group;
+			return AdditiveExpression(source)
+		case 'GroupExpression':
+		{
+			let group = source.shift();
+			// AdditiveExpression(source);
+			// while (source[0].type !)
+			AdditiveExpression(source)
+			console.log(source)
+		}
+
 	}
 }
 function MultiplicationExpression(source) {
@@ -104,5 +129,4 @@ function MultiplicationExpression(source) {
 			}
 	}
 }
-// Expression(source);
-// console.log(source)
+Expression(source)
