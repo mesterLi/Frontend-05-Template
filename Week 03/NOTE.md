@@ -31,7 +31,6 @@
         <MultiplicationExpression>
         |<AdditiveExpression><+><MultiplicationExpression>
         |<AdditiveExpression><-><MultiplicationExpression>
-        |<(><AdditiveExpression><)>
 
     <MultiplicationExpression> ::=
         <Number>
