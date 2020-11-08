@@ -1,0 +1,72 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+  }
+  #dragable {
+    width: 100px;
+    height: 100px;
+    background: pink;
+    cursor: pointer;
+    display: inline-block;
+  }
+</style>
+<body>
+  <div id="textWrap" style="word-wrap: break-word">文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字</div>
+  <div id="dragable"></div>
+</body>
+<script>
+  const dragable = document.getElementById("dragable");
+  const textChildNodes = document.getElementById("textWrap").childNodes[0];
+  const textContent = textChildNodes.textContent;
+  let ranges = [];
+  let baseX = 0, baseY = 0;
+  dragable.addEventListener('mousedown', e => {
+    const { clientX: startX, clientY: startY } = e;
+
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+    function move(e) {
+      const range = getNearest(e.clientX, e.clientY);
+      // const moveX = baseX + e.clientX - startX;
+      // const moveY = baseY + e.clientY - startY;
+      // dragable.style.transform = `translate(${moveX}px, ${moveY}px)`;
+      range.insertNode(dragable);
+    }
+    function up(e) {
+      console.log(e.clientX, e.clientY)
+      baseX = baseX + e.clientX - startX;
+      baseY = baseY + e.clientY - startY;
+      // console.log(baseX, baseY);
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+    }
+  });
+  function getNearest(clientX, clientY) {
+    let min = Number.MAX_SAFE_INTEGER;
+    let minRange = null;
+    for (let range of ranges) {
+      const { x, y } = range.getBoundingClientRect();
+      const distance = (x - clientX) **2 + (y - clientY) ** 2;
+      if (distance < min) {
+        min = distance;
+        minRange = range;
+      }
+    }
+    return minRange;
+  }
+  for (let i = 0; i < textContent.length; i++) {
+    let range = document.createRange();
+    range.setStart(textChildNodes, i);
+    range.setEnd(textChildNodes, i);
+    ranges.push(range);
+  }
+  document.addEventListener("selectstart", e => e.preventDefault());
+</script>
+</html>
