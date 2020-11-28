@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.1.0/build/g6.js"></script>
+    <title>Realm</title>
+    <style>
+        #Realm{
+            width: 100vw;
+            height: 100vh;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="Realm"></div>
+</body>
+</html>
+<script type="text/javascript">
+    const realms = [
+        eval,
+        isFinite,
+        isNaN,
+        parseInt,
+        parseFloat,
+        decodeURI,
+        decodeURIComponent,
+        encodeURI,
+        encodeURIComponent,
+        Array,
+        Date,
+        RegExp,
+        Promise,
+        Proxy,
+        Map,
+        WeakMap,
+        Set,
+        WeakSet,
+        Function,
+        Boolean,
+        String,
+        Number,
+        Symbol,
+        Object,
+        Error,
+        EvalError,
+        RangeError,
+        SyntaxError,
+        TypeError,
+        URIError,
+        ArrayBuffer,
+        DataView,
+        Float32Array,
+        Float64Array,
+        Int8Array,
+        Int16Array,
+        Int32Array,
+        Uint8Array,
+        Uint16Array,
+        Uint32Array,
+        Uint8ClampedArray,
+        Atomics,
+        JSON,
+        Math,
+        Reflect
+    ];
+    getData(realms)
+    function getData(list) {
+        let data = {
+            id: 'realm',
+            children: []
+        };
+        let tempData = [...list];
+        while (tempData.length > 0) {
+            let obj = tempData.pop();
+            if (typeof obj === 'function') {
+                obj = obj.prototype;
+            }
+            if (typeof obj === 'object') {
+                const objName = obj[Symbol.toStringTag] || obj.constructor.name;
+                const protoNames = Object.getOwnPropertyNames(obj);
+                console.log(obj)
+                data.children.push({
+                    id: objName,
+                    children: protoNames.map(name => ({
+                        id: `${objName}.${name}`
+                    }))
+                });
+            }
+        }
+        return data;
+    }
+    const graph = new G6.TreeGraph({
+        container: 'Realm',
+        width: window.innerWidth,
+        height: window.innerHeight,
+        pixelRatio: 2,
+        modes: {
+            default: [{
+                type: 'collapse-expand',
+                onChange: function onChange(item, collapsed) {
+                    var data = item.get('model').data;
+                    data.collapsed = collapsed;
+                    return true;
+                }
+            }, 'drag-canvas', 'zoom-canvas']
+        },
+        defaultNode: {
+            size: 16,
+            anchorPoints: [[0, 0.5], [1, 0.5]],
+            style: {
+                fill: '#40a9ff',
+                stroke: '#096dd9'
+            }
+        },
+        defaultEdge: {
+            shape: 'cubic-horizontal',
+            style: {
+                stroke: '#A3B1BF'
+            }
+        },
+        layout: {
+            type: 'compactBox',
+            direction: 'LR',
+            getId: function getId(d) {
+                return d.id;
+            },
+            getHeight: function getHeight() {
+                return 16;
+            },
+            getWidth: function getWidth() {
+                return 16;
+            },
+            getVGap: function getVGap() {
+                return 10;
+            },
+            getHGap: function getHGap() {
+                return 100;
+            }
+        }
+    });
+
+    graph.node(function(node) {
+        return {
+            size: 26,
+            style: {
+                fill: '#40a9ff',
+                stroke: '#096dd9'
+            },
+            label: node.id,
+            labelCfg: {
+                position: node.children && node.children.length > 0 ? 'left' : 'right'
+            }
+        };
+    });
+
+    graph.data(getData(realms));
+    graph.render();
+    graph.fitView();
+</script>
