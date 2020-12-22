@@ -1,10 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>match</title>
+  </head>
+  <body>
+    <div id="container">
+      <div class="red">1</div>
+      <div class="blue">2</div>
+      <div>
+        <div class="green"></div>
+      </div>
+      <p>p</p>
+    </div>
+  </body>
+  <script>
+    const TOKEN = ['SELECTOR', '>', 'SPACE', '+', '~'];
+    const reg = /([\#\.a-zA-Z]+)|([\>])|([ \t]+)|([\+])([\~])/g;
+
+    const selectorMatch = (node, token) => {
+      if (token.name === 'class') {
+        if (('.' + node.className).indexOf(token.value) < 0 && !prevSymbolIsSpace) {
+          return false;
+        }
+      }
+      if (token.name === 'id') {
+        if ('#' + node.id !== token.value && !prevSymbolIsSpace) {
+          return false;
+        }
+      }
+      if (token.name === 'tagName') {
+        if (token.value !== node.nodeName.toLowerCase() && !prevSymbolIsSpace) {
+          return false;
+        }
+			}
+			return true;
+    };
+    async function match(selectors, element) {
+      if (selectors === '*') return true;
+      const elements = Array.prototype.slice.call(element);
+      let [node] = elements;
+      if (!node) return false;
+      if (selectors === node.nodeName.toLowerCase()) return true;
+
+      const tokens = [];
+      for (let token of await tokenrize(selectors)) {
+        tokens.push(token);
+      }
+      let prevSymbolIsSpace = false;
+      while (tokens.length) {
+        const token = tokens.pop();
+        if (token.type === 'SELECTOR') {
+          if (prevSymbolIsSpace) {
+						if (selectorMatch(node, token) === false) {
+							tokens.push({
+								type: 'SPACE'
+							});
+						}
+					}
+					return selectorMatch(node, token);
+        } else if (token.type === 'SPACE') {
+          if (!node.parentNode) {
+            return false;
+          }
+          prevSymbolIsSpace = true;
+          node = node.parentNode;
+        } else if (token.type === '>') {
+          if (!node.parentNode) {
+            return false;
+          }
+          node = node.parentNode;
+          tokens.push(token);
+        }
+      }
+      return true;
+    }
+
+    function* tokenrize(str) {
+      let i = 0;
+      while (true) {
+        i++;
+        const result = reg.exec(str);
+        if (!result) {
+          break;
+        }
+        let token = {
+          type: null,
+          value: null,
+          name: 'tagName',
+        };
+        for (let i = 1; i < result.length; i++) {
+          if (result[i]) {
+            token.type = TOKEN[i - 1];
+            break;
+          }
+        }
+        token.value = result[0];
+        if (token.value[0] === '.') {
+          token.name = 'class';
+        }
+        if (token.value[0] === '#') {
+          token.name = 'id';
+        }
+        yield token;
+      }
+      yield {
+        type: 'EOF',
+      };
+    }
+
+    console.log(match('#container div', document.getElementsByClassName('green')));
+  </script>
 </html>
