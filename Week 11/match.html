@@ -9,7 +9,9 @@
       <div class="red">1</div>
       <div class="blue">2</div>
       <div>
-        <div class="green"></div>
+        <div>
+					<div class="green"></div>
+				</div>
       </div>
       <p>p</p>
     </div>
@@ -20,21 +22,21 @@
 
     const selectorMatch = (node, token) => {
       if (token.name === 'class') {
-        if (('.' + node.className).indexOf(token.value) < 0 && !prevSymbolIsSpace) {
+        if (('.' + node.className).indexOf(token.value) < 0) {
           return false;
         }
       }
       if (token.name === 'id') {
-        if ('#' + node.id !== token.value && !prevSymbolIsSpace) {
+        if ('#' + node.id !== token.value) {
           return false;
         }
       }
       if (token.name === 'tagName') {
-        if (token.value !== node.nodeName.toLowerCase() && !prevSymbolIsSpace) {
+        if (token.value !== node.nodeName.toLowerCase()) {
           return false;
         }
-			}
-			return true;
+      }
+      return true;
     };
     async function match(selectors, element) {
       if (selectors === '*') return true;
@@ -50,15 +52,19 @@
       let prevSymbolIsSpace = false;
       while (tokens.length) {
         const token = tokens.pop();
+        console.log(token);
         if (token.type === 'SELECTOR') {
-          if (prevSymbolIsSpace) {
-						if (selectorMatch(node, token) === false) {
-							tokens.push({
-								type: 'SPACE'
-							});
-						}
-					}
-					return selectorMatch(node, token);
+          if (selectorMatch(node, token) === false) {
+            if (prevSymbolIsSpace) {
+              // 上一次是空格，需要接着网上查找父级
+              tokens.push(token, {
+                type: 'SPACE',
+              });
+              prevSymbolIsSpace = false;
+            } else {
+              return false;
+            }
+          }
         } else if (token.type === 'SPACE') {
           if (!node.parentNode) {
             return false;
