@@ -11,6 +11,7 @@
       <div>
         <div>
 					<div class="green"></div>
+					<div class="black"></div>
 				</div>
       </div>
       <p>p</p>
@@ -18,7 +19,7 @@
   </body>
   <script>
     const TOKEN = ['SELECTOR', '>', 'SPACE', '+', '~'];
-    const reg = /([\#\.a-zA-Z]+)|([\>])|([ \t]+)|([\+])([\~])/g;
+    const reg = /([\#\.a-zA-Z]+)|([\>])|([ \t]+)|([\+])|([\~])/g;
 
     const selectorMatch = (node, token) => {
       if (token.name === 'class') {
@@ -49,10 +50,10 @@
       for (let token of await tokenrize(selectors)) {
         tokens.push(token);
       }
-      let prevSymbolIsSpace = false;
+			let prevSymbolIsSpace = false;
       while (tokens.length) {
-        const token = tokens.pop();
-        console.log(token);
+				const token = tokens.pop();
+				console.log('token', token)
         if (token.type === 'SELECTOR') {
           if (selectorMatch(node, token) === false) {
             if (prevSymbolIsSpace) {
@@ -76,8 +77,14 @@
             return false;
           }
           node = node.parentNode;
-          tokens.push(token);
-        }
+        } else if (token.type === '+') {
+					// console.log('node.previousSibling', node.previousElementSibling)
+					if (!node.previousElementSibling) {
+            return false;
+          }
+					node = node.previousElementSibling;
+					console.log('node', node)
+				}
       }
       return true;
     }
@@ -86,7 +93,8 @@
       let i = 0;
       while (true) {
         i++;
-        const result = reg.exec(str);
+				const result = reg.exec(str);
+				// console.log(result)
         if (!result) {
           break;
         }
@@ -115,6 +123,6 @@
       };
     }
 
-    console.log(match('#container div', document.getElementsByClassName('green')));
+		console.log(match('#container .green+.black', document.getElementsByClassName('black')));
   </script>
 </html>
