@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <h1>Node Api</h1>
+  <ul id='container1'>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+    <li>4</li>
+    <li>5</li>
+  </ul>
+  <h1>Range Api</h1>
+  <ul id='container2'>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+    <li>4</li>
+    <li>5</li>
+  </ul>
+</body>
+
+</html>
+
+<script>
+  const container1 = document.getElementById('container1')
+  const reverseChildren1 = (element) => {
+    const children = [...element.children];
+    while (i-- > 0) {
+      container1.appendChild(children[i])
+    }
+  }
+  reverseChildren1(container1);
+
+  const container2 = document.getElementById('container2');
+  const reverseChildren2 = (element) => {
+    const range = new Range();
+    range.selectNodeContents(element);
+    const fragment = range.extractContents(element);
+    const children = fragment.children
+    while (i-- > 0) {
+      fragment.appendChild(children[i])
+    }
+    element.appendChild(fragment)
+  }
+  reverseChildren2(container2);
+</script>
