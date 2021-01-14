@@ -6,9 +6,16 @@ export class Component {
 		this.children = [];
 		this._root = null;
 		this._range = null;
+		this._isFirstRender = false;
+	}
+	get range() {
+		return this._range;
 	}
 	get vdom() {
 		return this.render().vdom
+	}
+	componentDidMount() {
+		
 	}
 	setAttribute(name, value) {
 		this.props[name] = value;
@@ -21,6 +28,10 @@ export class Component {
 		this._range = range;
 		this._vdom = this.vdom;
 		this._vdom[RENDER_TO_DOM](range);
+		if (!this._isFirstRender) {
+			this.componentDidMount();
+			this._isFirstRender = true
+		}
 	}
 	/*
 	rerender() {
@@ -212,9 +223,12 @@ export function createElement(type, attributes, ...children) {
 }
 
 export function render(component, parentElement) {
+	// console.log(parentElement)
 	const range = document.createRange();
 	range.setStart(parentElement, 0);
 	range.setEnd(parentElement, parentElement.childNodes.length);
 	range.deleteContents();
 	component[RENDER_TO_DOM](range);
+	// console.log(component)
+	// parentElement.appendChild(component);
 }

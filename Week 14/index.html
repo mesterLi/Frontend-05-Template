@@ -9,51 +9,34 @@
         font: 14px "Century Gothic", Futura, sans-serif;
         margin: 20px;
     }
+    .carousel {
+        width: 300px;
+        height: 200px;
+        overflow: hidden;
+    }
+    .carousel__wrapper {
+        height: 200px;
+        white-space: nowrap;
+        transition: transform ease .5s;
+    }
+    .carousel__wrapper>div{
+        width: 300px;
+        height: 200px;
+        display: inline-block;
 
-    ol, ul {
-        padding-left: 30px;
     }
 
-    .board-row:after {
-        clear: both;
-        content: "";
-        display: table;
+    .carousel__wrapper .red {
+        background-color: red;
     }
-
-    .status {
-        margin-bottom: 10px;
+    .carousel__wrapper .green {
+        background-color: green;
     }
-
-    .square {
-        background: #fff;
-        border: 1px solid #999;
-        float: left;
-        font-size: 24px;
-        font-weight: bold;
-        line-height: 34px;
-        height: 34px;
-        margin-right: -1px;
-        margin-top: -1px;
-        padding: 0;
-        text-align: center;
-        width: 34px;
+    .carousel__wrapper .black {
+        background-color: black;
     }
-
-    .square:focus {
-        outline: none;
-    }
-
-    .kbd-navigation .square:focus {
-        background: #ddd;
-    }
-
-    .game {
-        display: flex;
-        flex-direction: row;
-    }
-
-    .game-info {
-        margin-left: 20px;
+    .carousel__wrapper .yellow {
+        background-color: yellow;
     }
 
 </style>
