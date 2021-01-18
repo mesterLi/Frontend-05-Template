@@ -1,3 +1,5 @@
+import { cubicBezier, liner, ease, easeIn, easeOut, easeInOut } from './cubic.js';
+
 const TICK = Symbol("tick");
 const ANIMATIONS = Symbol("animations");
 const START_TIME = Symbol("start_time");
@@ -40,7 +42,7 @@ export class Timeline {
     this[TICK]();
   }
   pause() {
-  	console.log("暂停")
+  	// console.log("暂停")
 	  this[PAUSE_START_TIME] = Date.now();
   	window.cancelAnimationFrame(this[TICK_HANDLER]);
   }
@@ -66,7 +68,7 @@ export class Timeline {
 }
 
 export class Animation {
-  constructor (object, property, startValue, endValue, duration, delay, template) {
+  constructor (object, property, startValue, endValue, duration, delay, template, timeingFunction) {
     this.object = object;
     this.property = property;
     this.startValue = startValue;
@@ -74,13 +76,25 @@ export class Animation {
     this.duration = duration || 2000;
     this.delay = delay || 0;
     this.template = template || (v => v);
+    this.timeingFunction = timeingFunction;
+    // console.log(this.timeingFunction)
   }
 
   receive(time) {
     const range = this.endValue - this.startValue;
+    const process = this.timeingFunction(time / this.duration);
     // 改变要做出动画的属性值
     // 开始值 + (差值 * 过去的时间 / 总动画时长)
-    this.object[this.property] = this.template(this.startValue + range / this.duration * time);
+    this.object[this.property] = this.template(this.startValue + range * process);
     console.log(this.object[this.property])
   }
+}
+
+export {
+  cubicBezier,
+  liner,
+  ease,
+  easeIn,
+  easeInOut,
+  easeOut
 }

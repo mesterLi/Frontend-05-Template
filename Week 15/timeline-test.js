@@ -1,4 +1,4 @@
-import { Timeline, Animation } from './Timeline';
+import { Timeline, Animation, ease } from './Timeline';
 
 const tl = new Timeline();
 
@@ -14,7 +14,8 @@ const an1 = new Animation(
   300,
   3000,
 	2000,
-	v => `translateX(${v}px)`
+  v => `translateX(${v}px)`,
+  ease
 )
 
 tl.add(an1);

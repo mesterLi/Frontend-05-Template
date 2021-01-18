@@ -1,33 +1,49 @@
-学习笔记
-## 对象与组件
+## 动画实现方式
 
-#### 对象
+1. setInterval
 
-  1. Properties 属性
-  2. Methods    方法
-  3. inherit    继承
+  ```js
+  // 16毫秒为一祯
+  setInterval(() => {}, 16);
+  ```
 
-#### 组件（基本上是对象的丰富化）
+2. setTimeout
 
-  1. Properties 属性
-  2. Methods    方法
-  3. inherit    继承
-  4. Attribute  特性（描述组件特征）
-  5. Config & State  组件的配置 & 组件的内部状态
-  6. Event      事件，组件往外去传递数据的桥梁
-  7. LifeCycle  声明周期 (init、mount、unmount、update)
-  8. Children   树形结构的必要条件
+  ```js
+  let tick = function () {
+    setTimeout(tick, 16);
+  };
+  ```
 
-#### 用户
+3. requestAnimationFrame
 
-保证用户能更改组件状态，而组件使用者尽量不要去修改（保证状态唯一）
+  ```js
+  let tick = function () {
+    let handler = requestAnimationFrame(tick);
+    cancelAnimationFrame(handler);
+  };
+  ```
 
-#### 使用者
+  ## 手势
 
-通过attribute、properties、config影响组件
+  <img src="./gesture.png" />
 
-  * attribute & properties
+## 事件
 
-  * config
+1. 自定义事件
 
-  * Event
+  ```js
+  const event = new Event(typeArg, eventInit);
+  eventInit = {
+    bubbles: false, // 是否冒泡， 默认false
+    cancelable: false, // 是否能被取消， 默认false
+    composed: false // 是否会在影子DOM根节点之外触发侦听器, 默认false
+  }
+  ```
+
+2. 触发事件
+
+  ```js
+  cancelled = !target.dispatchEvent(event)
+  // 当该事件是可取消的(cancelable为true)并且至少一个该事件的 事件处理方法 调用了Event.preventDefault()，则返回值为false；否则返回true
+  ```
