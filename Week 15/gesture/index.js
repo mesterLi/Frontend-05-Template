@@ -65,6 +65,7 @@ class Listener {
     document.addEventListener('touchstart', (event) => {
       for (const touch of event.changedTouches) {
         let content = Object.create(null);
+        console.log(touch)
         contents.set(touch.identifier, content);
         recoginizer.start(touch, content);
       }
@@ -79,7 +80,7 @@ class Listener {
       for (const touch of event.changedTouches) {
         let content = contents.get(touch.identifier);
         recoginizer.end(touch, content);
-        contents.delete(touch, identifier);
+        contents.delete(touch, touch.identifier);
       }
     });
     document.addEventListener('touchcancel', (event) => {
