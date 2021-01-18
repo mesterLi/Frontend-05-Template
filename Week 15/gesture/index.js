@@ -2,7 +2,7 @@ let element = document.documentElement;
 let contents = new Map();
 let isListeningMouse = false;
 
-export class Dispatch {
+class Dispatch {
   constructor(el) {
     this.element = el;
   }
@@ -11,17 +11,16 @@ export class Dispatch {
     for (const name in properties) {
       event[name] = properties[name];
     }
-    element.dispatchEvent(event);
+    this.element.dispatchEvent(event);
   }
 }
 
-// new
-
-export class Listener {
+class Listener {
   constructor(el, recoginizer) {
-    el.addEventListener("mousedown", (event) => {
+    console.log(el)
+    el.addEventListener('mousedown', (event) => {
       let content = Object.create(null);
-      contents.set("mouse" + (1 << event.button), content);
+      contents.set('mouse' + (1 << event.button), content);
       recoginizer.start(event, content);
 
       let mousemove = (event) => {
@@ -36,7 +35,7 @@ export class Listener {
             } else if (button === 4) {
               key = 2;
             }
-            let content = contents.get("mouse" + key);
+            let content = contents.get('mouse' + key);
             recoginizer.move(event, content);
           }
           button = button << 1;
@@ -44,18 +43,18 @@ export class Listener {
       };
 
       let mouseup = (event) => {
-        let content = contents.get("mouse" + (1 << event.button));
+        let content = contents.get('mouse' + (1 << event.button));
         recoginizer.end(event, content);
-        contents.delete("mouse" + (1 << event.button));
+        contents.delete('mouse' + (1 << event.button));
         if (event.buttons === 0) {
-          document.removeEventListener("mousemove", mousemove);
-          document.removeEventListener("mouseup", mouseup);
+          document.removeEventListener('mousemove', mousemove);
+          document.removeEventListener('mouseup', mouseup);
           isListeningMouse = false;
         }
       };
       if (!isListeningMouse) {
-        document.addEventListener("mousemove", mousemove);
-        document.addEventListener("mouseup", mouseup);
+        document.addEventListener('mousemove', mousemove);
+        document.addEventListener('mouseup', mouseup);
         isListeningMouse = true;
       }
     });
@@ -63,27 +62,27 @@ export class Listener {
     /*
      ** touch event
      */
-    document.addEventListener("touchstart", (event) => {
+    document.addEventListener('touchstart', (event) => {
       for (const touch of event.changedTouches) {
         let content = Object.create(null);
         contents.set(touch.identifier, content);
         recoginizer.start(touch, content);
       }
     });
-    document.addEventListener("touchmove", (event) => {
+    document.addEventListener('touchmove', (event) => {
       for (const touch of event.changedTouches) {
         let content = contents.get(touch.identifier);
         recoginizer.move(touch, content);
       }
     });
-    document.addEventListener("touchend", (event) => {
+    document.addEventListener('touchend', (event) => {
       for (const touch of event.changedTouches) {
         let content = contents.get(touch.identifier);
         recoginizer.end(touch, content);
         contents.delete(touch, identifier);
       }
     });
-    document.addEventListener("touchcancel", (event) => {
+    document.addEventListener('touchcancel', (event) => {
       for (const touch of event.changedTouches) {
         let content = contents.get(touch.identifier);
         recoginizer.cancel(touch, content);
@@ -93,7 +92,7 @@ export class Listener {
   }
 }
 
-export class Recoginizer {
+class Recoginizer {
   constructor(dispatcher) {
     this.dispatcher = dispatcher;
   }
@@ -117,7 +116,7 @@ export class Recoginizer {
 
     // 0.5s press
     content.handler = setTimeout(() => {
-      this.dispatcher.dispatch("press-start", {});
+      this.dispatcher.dispatch('press-start', {});
       content.isPress = true;
       content.isPan = false;
       content.isTap = false;
@@ -133,7 +132,7 @@ export class Recoginizer {
       content.isPan = true;
       content.isPress = false;
       content.isTap = false;
-      this.dispatcher.dispatch("pan-start", {
+      this.dispatcher.dispatch('pan-start', {
         startX: content.startX,
         startY: content.startY,
         clientX: point.clientX,
@@ -143,7 +142,7 @@ export class Recoginizer {
       clearTimeout(content.handler);
     }
     if (content.isPan) {
-      this.dispatcher.dispatch("pan", {
+      this.dispatcher.dispatch('pan', {
         startX: content.startX,
         startY: content.startY,
         clientX: point.clientX,
@@ -173,7 +172,7 @@ export class Recoginizer {
     }
     if (v >= 1.5) {
       content.isFlick = true;
-      this.dispatcher.dispatch("flick", {
+      this.dispatcher.dispatch('flick', {
         startX: content.startX,
         startY: content.startY,
         clientX: point.clientX,
@@ -185,14 +184,14 @@ export class Recoginizer {
     } else content.isFlick = false;
 
     if (content.isTap) {
-      this.dispatcher.dispatch("tap", {});
+      this.dispatcher.dispatch('tap', {});
       clearTimeout(content.handler);
     }
     if (content.isPress) {
-      this.dispatcher.dispatch("press-end", {});
+      this.dispatcher.dispatch('press-end', {});
     }
     if (content.isPan) {
-      this.dispatcher.dispatch("pan-end", {
+      this.dispatcher.dispatch('pan-end', {
         startX: content.startX,
         startY: content.startY,
         clientX: point.clientX,
@@ -205,10 +204,10 @@ export class Recoginizer {
 
   cancel(point, content) {
     clearTimeout(content.handler);
-    this.dispatcher.dispatch("cancel", {});
+    this.dispatcher.dispatch('cancel', {});
   }
 }
 
-export function EnableGestrue(el) {
+function enableGestrue(el) {
   return new Listener(el, new Recoginizer(new Dispatch(el)));
 }
