@@ -26,7 +26,7 @@
 
   ## 手势
 
-  <img src="./gesture.png" />
+  ![gesture 图标](./gesture.png "gesture")
 
 ## 事件
 
