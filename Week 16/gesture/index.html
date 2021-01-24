@@ -1,0 +1,20 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="test" style="width: 500px; height: 500px; background-color: yellow;"></div>
+</body>
+<script src="./index.js"></script>
+<script>
+  const test = document.getElementById('test');
+  enableGestrue(test);
+  test.addEventListener('tap', () => console.log('tap trigger'));
+  test.addEventListener('press-start', () => console.log('press-start trigger'));
+  test.addEventListener('pan', () => console.log('pan trigger'));
+  test.addEventListener('pan-end', () => console.log('pan-end trigger'));
+  test.addEventListener('flick', () => console.log('flick trigger'));
+</script>
+</html>

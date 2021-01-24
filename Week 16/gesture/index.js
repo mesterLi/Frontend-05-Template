@@ -104,7 +104,7 @@ class Recoginizer {
 
     content.startX = point.clientX
     content.startY = point.clientY
-
+    this.dispatcher.dispatch('start', {});
     // flick
     content.points = [
       {
