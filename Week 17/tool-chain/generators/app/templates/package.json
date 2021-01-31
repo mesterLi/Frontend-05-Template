@@ -1,0 +1,8 @@
+{
+  "name": "webapp",
+  "version": "1.0.0",
+  "script": {
+    "dev": "webpack-dev-server webpack.config.js"
+  },
+  "dependencies": {}
+}

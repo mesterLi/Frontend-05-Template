@@ -1,0 +1,22 @@
+{
+  "name": "generator-vue",
+  "version": "1.0.0",
+  "description": "",
+  "main": "generators/app/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "yeoman-generator"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vue": "^2.6.12",
+    "yeoman-generator": "^4.13.0"
+  },
+  "devDependencies": {
+    "vue-loader": "^15.9.6",
+    "webpack": "^5.19.0"
+  }
+}
